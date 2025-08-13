@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import date, datetime, timedelta
 from decimal import Decimal
 from typing import Any, Dict, List, Tuple
+import re
 
 from tools.data_management.sheets_reader import read_range
 from tools.analysis.expense_analyzer import (
@@ -19,6 +20,39 @@ from tools.analysis.report_generator import format_key_amount_map_for_slack
 def _parse_simple_dates(query: str) -> tuple[str | None, str | None]:
 	q = query.lower()
 	today = date.today()
+	# last N months
+	m_last = re.search(r"last\s+(\d+)\s+months?", q)
+	if m_last:
+		n = max(1, int(m_last.group(1)))
+		first_this = date(today.year, today.month, 1)
+		end = today
+		# compute start by going back n-1 months from first day of this month
+		y, m = first_this.year, first_this.month
+		for _ in range(n):
+			m -= 1
+			if m == 0:
+				y -= 1
+				m = 12
+		start = date(y, m, 1)
+		return start.isoformat(), end.isoformat()
+	# past N days
+	m_days = re.search(r"past\s+(\d+)\s+days?", q)
+	if m_days:
+		n = max(1, int(m_days.group(1)))
+		start = today - timedelta(days=n)
+		return start.isoformat(), today.isoformat()
+	# quarters: q[1-4] yyyy or q[1-4]-yyyy
+	m_q = re.search(r"q([1-4])[-\s]?([12][0-9]{3})", q)
+	if m_q:
+		qnum = int(m_q.group(1))
+		year = int(m_q.group(2))
+		start_month = (qnum - 1) * 3 + 1
+		start = date(year, start_month, 1)
+		if start_month == 10:
+			end = date(year + 1, 1, 1) - timedelta(days=1)
+		else:
+			end = date(year, start_month + 3, 1) - timedelta(days=1)
+		return start.isoformat(), end.isoformat()
 	if "last month" in q:
 		first_this = date(today.year, today.month, 1)
 		last_month_end = first_this - timedelta(days=1)
@@ -27,7 +61,7 @@ def _parse_simple_dates(query: str) -> tuple[str | None, str | None]:
 	if "this month" in q:
 		start = date(today.year, today.month, 1).isoformat()
 		return start, today.isoformat()
-	# yyyy-mm
+	# yyyy-mm explicit month
 	for token in q.split():
 		if len(token) == 7 and token[4] == "-":
 			try:
@@ -50,7 +84,7 @@ def handle_query(query: str) -> str:
 	- by category | by vendor | by month
 	- top vendors N
 	- largest expenses N
-	- last month | this month | explicit yyyy-mm
+	- last month | this month | explicit yyyy-mm | last N months | past N days | Q[1-4] YYYY
 	"""
 	values: List[List[Any]] = read_range("Expenses!A:K")
 	rows = rows_from_values(values)
@@ -81,11 +115,10 @@ def handle_query(query: str) -> str:
 	if "largest" in q and "expenses" in q:
 		# build list of (vendor, amount, date)
 		items = []
+		from tools.analysis.expense_analyzer import _in_date_range  # local import
 		for r in rows:
-			if start or end:
-				from tools.analysis.expense_analyzer import _in_date_range  # local import
-				if not _in_date_range(r, start, end):
-					continue
+			if not _in_date_range(r, start, end):
+				continue
 			amt = r.get("amount")
 			try:
 				val = Decimal(str(amt))
