@@ -1,0 +1,15 @@
+{
+	"columns": [
+		"Date",
+		"Vendor",
+		"Amount",
+		"Category",
+		"Receipt_PDF_Link",
+		"Receipt_Image_Link",
+		"Description",
+		"Payment_Method",
+		"Currency",
+		"Confidence_Score",
+		"Processed_Date"
+	]
+} 

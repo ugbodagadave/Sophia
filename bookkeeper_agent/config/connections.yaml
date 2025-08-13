@@ -1,0 +1,23 @@
+google_sheets:
+  credentials_path: ${GOOGLE_SHEETS_CREDENTIALS_PATH}
+  spreadsheet_id: ${GOOGLE_SHEETS_SPREADSHEET_ID}
+  worksheet_name: ${GOOGLE_SHEETS_WORKSHEET_NAME}
+  drive_folder_id: ${GOOGLE_DRIVE_FOLDER_ID}
+
+slack:
+  bot_token: ${SLACK_BOT_TOKEN}
+  app_token: ${SLACK_APP_TOKEN}
+  signing_secret: ${SLACK_SIGNING_SECRET}
+  default_channel: ${SLACK_CHANNEL_ID}
+
+ibm_watsonx:
+  api_key: ${WATSONX_API_KEY}
+  project_id: ${WATSONX_PROJECT_ID}
+  url: ${WATSONX_URL}
+  model_id: ${GRANITE_MODEL_ID}
+
+storage:
+  type: ${FILE_STORAGE_TYPE}
+  local_path: ${LOCAL_STORAGE_PATH}
+  bucket: ${CLOUD_STORAGE_BUCKET}
+  public_url_base: ${PUBLIC_URL_BASE} 

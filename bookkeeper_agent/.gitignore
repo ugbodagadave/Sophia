@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg*
+.eggs/
+build/
+dist/
+*.manifest
+*.spec
+
+# Virtual env
+.venv/
+.env
+.env.*
+
+# Logs
+logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data & credentials
+config/google-credentials.json
+bookkeeper_agent/data/file_storage/
+bookkeeper_agent/tests/test_data/sample_receipts/
+
+# Coverage / test
+.coverage
+htmlcov/
+.pytest_cache/ 

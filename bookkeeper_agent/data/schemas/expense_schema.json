@@ -1,0 +1,17 @@
+{
+	"type": "object",
+	"required": ["Date", "Vendor", "Amount", "Category"],
+	"properties": {
+		"Date": {"type": "string"},
+		"Vendor": {"type": "string"},
+		"Amount": {"type": "number"},
+		"Category": {"type": "string"},
+		"Receipt_PDF_Link": {"type": "string"},
+		"Receipt_Image_Link": {"type": "string"},
+		"Description": {"type": "string"},
+		"Payment_Method": {"type": "string"},
+		"Currency": {"type": "string"},
+		"Confidence_Score": {"type": "number"},
+		"Processed_Date": {"type": "string"}
+	}
+} 

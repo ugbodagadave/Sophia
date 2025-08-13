@@ -1,0 +1,39 @@
+agent:
+  name: "BookkeeperAgent"
+  description: "AI bookkeeping assistant for receipt processing and expense analysis"
+  model: "ibm/granite-3.3-8b-instruct"
+  instructions: |
+    You are a professional bookkeeping assistant that helps users manage their expenses.
+    Process receipts, extract financial data, and provide insights about spending patterns.
+
+tools:
+  - name: "pdf_extractor"
+    description: "Extract text content from PDF receipts and invoices"
+    file: "tools/document_processing/pdf_extractor.py"
+
+  - name: "image_ocr"
+    description: "Perform OCR on JPEG receipt images using Tesseract"
+    file: "tools/document_processing/image_ocr.py"
+
+  - name: "receipt_parser"
+    description: "Parse structured data from receipt text using AI"
+    file: "tools/document_processing/receipt_parser.py"
+
+  - name: "file_storage"
+    description: "Store receipt files and generate accessible links"
+    file: "tools/data_management/file_storage.py"
+
+  - name: "sheets_writer"
+    description: "Write expense data to Google Sheets with file links"
+    file: "tools/data_management/sheets_writer.py"
+
+  - name: "expense_analyzer"
+    description: "Analyze spending patterns and generate reports"
+    file: "tools/analysis/expense_analyzer.py"
+
+channels:
+  - name: "slack"
+    type: "slack_app"
+    config:
+      app_token: "${SLACK_APP_TOKEN}"
+      bot_token: "${SLACK_BOT_TOKEN}" 

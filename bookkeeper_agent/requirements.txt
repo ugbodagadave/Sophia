@@ -1,0 +1,32 @@
+python-dotenv>=1.0.1
+pydantic>=2.7.0
+requests>=2.32.0
+ibm-watsonx-ai>=1.1.0
+
+# Google APIs
+google-api-python-client>=2.130.0
+google-auth>=2.32.0
+google-auth-httplib2>=0.2.0
+google-auth-oauthlib>=1.2.0
+
+# Slack
+slack_sdk>=3.27.1
+
+# OCR & Image Processing
+pytesseract>=0.3.10
+pillow>=10.3.0
+opencv-python>=4.10.0.84
+
+# PDF Processing
+pdfplumber>=0.11.0
+PyPDF2>=3.0.1
+
+# Data & Utils
+pandas>=2.2.2
+numpy>=1.26.4
+tenacity>=8.3.0
+loguru>=0.7.2
+
+# Testing
+pytest>=8.2.2
+pytest-cov>=5.0.0 

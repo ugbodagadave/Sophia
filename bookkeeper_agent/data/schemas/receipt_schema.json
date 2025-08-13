@@ -1,0 +1,15 @@
+{
+	"type": "object",
+	"required": ["date", "vendor", "amount", "category"],
+	"properties": {
+		"date": {"type": "string", "format": "date"},
+		"vendor": {"type": "string"},
+		"amount": {"type": "number"},
+		"category": {"type": "string"},
+		"currency": {"type": "string"},
+		"confidence": {"type": "number", "minimum": 0, "maximum": 100},
+		"receipt_pdf_link": {"type": "string"},
+		"receipt_image_link": {"type": "string"},
+		"notes": {"type": "string"}
+	}
+} 
