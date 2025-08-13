@@ -43,6 +43,15 @@ def build_receipt_blocks(parsed: Dict[str, Any], links: Dict[str, str] | None = 
 		context_parts.append(f"{confidence:.0f}% confidence")
 	if context_parts:
 		blocks.append({"type": "context", "elements": [{"type": "mrkdwn", "text": " | ".join(context_parts)}]})
+	# Actions block for follow-ups
+	blocks.append({
+		"type": "actions",
+		"elements": [
+			{"type": "button", "text": {"type": "plain_text", "text": "✏️ Edit Details"}, "action_id": "edit_details"},
+			{"type": "button", "style": "primary", "text": {"type": "plain_text", "text": "✅ Approve"}, "action_id": "approve"},
+			{"type": "button", "style": "danger", "text": {"type": "plain_text", "text": "❌ Reject"}, "action_id": "reject"},
+		]
+	})
 	return blocks
 
 

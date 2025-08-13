@@ -81,13 +81,11 @@ Env variables:
 ### Phase 7 — Deployment & Monitoring
 Deliverables:
 - Deploy to IBM watsonx Orchestrate
-- Logging/metrics wiring; optional Sentry
 - Documentation updates in `docs/`
 
 Env variables:
 - Security: `SECRET_KEY`, `JWT_SECRET_KEY`, `ENCRYPT_FILES`
-- Monitoring: `LOG_LEVEL`, `LOG_FILE_PATH`, `ENABLE_PERFORMANCE_MONITORING`, `SENTRY_DSN`
-- Perf: `API_RATE_LIMIT_PER_MINUTE`, `MAX_CONCURRENT_PROCESSING`, `CACHE_ENABLED`, `CACHE_TTL_SECONDS`
+
 
 ---
 At each phase boundary, validate env variables are present in your local `.env`. Do not commit secrets. Ask the user for env files information.

@@ -97,6 +97,9 @@ def handle_query(query: str) -> str:
 	export_csv = "export csv" in q
 	export_json = "export json" in q
 
+	client = SlackClient()
+	channel = client.settings.slack_channel_id
+
 	if "by category" in q:
 		data = summarize_by_category(rows, start, end)
 		if export_csv:
@@ -105,18 +108,26 @@ def handle_query(query: str) -> str:
 		if export_json:
 			link = save_report_json("reports/by_category.json", {k: str(v) for k, v in data.items()})
 			return f"Report saved: {link}" if link else format_key_amount_map_for_slack("Spend by Category:", data)
-		# Also attempt Block Kit if configured
-		settings_client = SlackClient()
-		if settings_client.settings.slack_channel_id:
+		if channel:
 			fields = build_fields_with_percentages(data)
 			blocks = build_analytics_blocks("📊 Spend by Category", "Totals by category", fields)
-			settings_client.post_blocks(settings_client.settings.slack_channel_id, blocks, text="Analytics")
+			client.post_blocks(channel, blocks, text="Analytics")
 		return format_key_amount_map_for_slack("Spend by Category:", data)
+
 	if "by vendor" in q:
 		data = summarize_by_vendor(rows, start, end)
+		if channel:
+			fields = build_fields_with_percentages(data)
+			blocks = build_analytics_blocks("📊 Spend by Vendor", "Totals by vendor", fields)
+			client.post_blocks(channel, blocks, text="Analytics")
 		return format_key_amount_map_for_slack("Spend by Vendor:", data)
+
 	if "by month" in q:
 		data = summarize_by_month(rows, start, end)
+		if channel:
+			fields = build_fields_with_percentages(data)
+			blocks = build_analytics_blocks("📊 Spend by Month", "Totals by month", fields)
+			client.post_blocks(channel, blocks, text="Analytics")
 		return format_key_amount_map_for_slack("Spend by Month:", data)
 
 	if "top vendors" in q:
@@ -128,6 +139,10 @@ def handle_query(query: str) -> str:
 				break
 		data = summarize_by_vendor(rows, start, end)
 		top = dict(sorted(data.items(), key=lambda kv: kv[1], reverse=True)[:n])
+		if channel:
+			fields = build_fields_with_percentages(top)
+			blocks = build_analytics_blocks("📊 Top Vendors", f"Top {n} vendors by spend", fields)
+			client.post_blocks(channel, blocks, text="Analytics")
 		return format_key_amount_map_for_slack("Top Vendors:", top)
 
 	if "largest" in q and "expenses" in q:
@@ -152,6 +167,10 @@ def handle_query(query: str) -> str:
 		lines = ["Largest Expenses:"]
 		for vendor, amt, d in items[:n]:
 			lines.append(f"- {d}: {vendor} {amt}")
+		if channel:
+			fields = {f"{d} — {vendor}": str(amt) for vendor, amt, d in items[:n]}
+			blocks = build_analytics_blocks("📊 Largest Expenses", f"Top {n} expenses", fields)
+			client.post_blocks(channel, blocks, text="Analytics")
 		return "\n".join(lines)
 
 	# default summary
