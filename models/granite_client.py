@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Dict, Any, Optional
 
-from bookkeeper_agent.config.settings import get_settings
+from config.settings import get_settings
 
 
 class GraniteClient:

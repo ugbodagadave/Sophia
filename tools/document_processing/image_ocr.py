@@ -6,7 +6,7 @@ from typing import Optional, Tuple
 import pytesseract
 from PIL import Image
 
-from bookkeeper_agent.config.settings import get_settings
+from config.settings import get_settings
 
 
 def ocr_image_to_text(image_path: Path) -> str:

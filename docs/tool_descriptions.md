@@ -8,6 +8,10 @@
 ## Data Management
 - `file_storage.py`: Storage abstraction. Local backend implemented; cloud backends to be added (Drive/S3/Azure)
 
+## Integrations
+- `integrations/google_sheets.py`: Append and read ranges from Google Sheets
+- `integrations/slack_api.py`: Post messages and download files from Slack using bot token
+
 ## Document Processing
 - `pdf_extractor.py`: Extract text from PDFs using pdfplumber with PyPDF2 fallback
 - `image_preprocessor.py`: Enhance images (grayscale, median denoise, autocontrast, optional threshold)

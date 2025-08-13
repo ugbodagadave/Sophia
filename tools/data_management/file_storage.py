@@ -3,8 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Optional
 
-from bookkeeper_agent.config.settings import get_settings
-from bookkeeper_agent.tools.utilities.file_handler import ensure_directory, write_bytes
+from config.settings import get_settings
+from tools.utilities.file_handler import ensure_directory, write_bytes
 
 
 class FileStorage:

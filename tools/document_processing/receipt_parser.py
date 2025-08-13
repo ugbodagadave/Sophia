@@ -4,9 +4,9 @@ import re
 from decimal import Decimal
 from typing import Dict, Any
 
-from bookkeeper_agent.models.granite_client import GraniteClient
-from bookkeeper_agent.tools.utilities.date_parser import parse_date
-from bookkeeper_agent.tools.utilities.currency_handler import normalize_amount
+from models.granite_client import GraniteClient
+from tools.utilities.date_parser import parse_date
+from tools.utilities.currency_handler import normalize_amount
 
 
 DATE_REGEXES = [
