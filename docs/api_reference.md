@@ -28,5 +28,19 @@
 - handle_slack_file(file_url: str, vendor_hint: Optional[str] = None, amount_hint: Optional[str] = None) -> str
 - send_status(text: str) -> None
 
+## Analysis
+- rows_from_values(values: List[List[Any]], header: Optional[List[str]] = None) -> List[Dict[str, Any]]
+- summarize_by_category(rows: Iterable[Dict[str, Any]], start_date: Optional[str] = None, end_date: Optional[str] = None) -> Dict[str, Decimal]
+- summarize_by_vendor(rows: Iterable[Dict[str, Any]], start_date: Optional[str] = None, end_date: Optional[str] = None) -> Dict[str, Decimal]
+- summarize_by_month(rows: Iterable[Dict[str, Any]], start_date: Optional[str] = None, end_date: Optional[str] = None) -> Dict[str, Decimal]
+- totals_and_averages(rows: Iterable[Dict[str, Any]], start_date: Optional[str] = None, end_date: Optional[str] = None) -> Dict[str, Any]
+- format_summary_for_slack(rows: Iterable[Dict[str, Any]], start_date: Optional[str] = None, end_date: Optional[str] = None) -> str
+- classify_expense(vendor: str, description: str | None) -> str
+- format_key_amount_map_for_slack(title: str, data: Dict[str, Decimal]) -> str
+- format_overview_for_slack(total_formatted: str, average_formatted: str, count: int) -> str
+- dicts_to_csv_string(rows: Iterable[Dict[str, object]], fieldnames: List[str]) -> str
+- data_to_json_string(data: object) -> str
+
 ## Workflows
 - process_slack_file_url(file_url: str) -> str
+- handle_query(query: str) -> str

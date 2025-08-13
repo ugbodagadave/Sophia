@@ -17,3 +17,8 @@
 - `image_preprocessor.py`: Enhance images (grayscale, median denoise, autocontrast, optional threshold)
 - `image_ocr.py`: Tesseract OCR with optional average confidence score
 - `receipt_parser.py`: Heuristic parsing with optional Granite enrichment
+
+## Analysis
+- `tools/analysis/expense_analyzer.py`: Aggregate spend by category, vendor, and month; compute totals and averages; utilities to map sheet rows and format a Slack-ready summary.
+- `tools/analysis/category_classifier.py`: Keyword-based classifier for vendors/descriptions; returns a category or `Uncategorized`; ready for optional Granite enrichment for ambiguous cases.
+- `tools/analysis/report_generator.py`: Format analyzer outputs for Slack blocks; export helpers to CSV/JSON strings for saving or sharing.

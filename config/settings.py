@@ -48,6 +48,11 @@ class AppSettings(BaseSettings):
 	log_level: str = "INFO"
 	log_file_path: str = "./logs/bookkeeper.log"
 
+	# Phase 5 — Analysis defaults
+	default_currency: str = "USD"
+	timezone: str = "America/New_York"
+	auto_categorization: bool = True
+
 	model_config = SettingsConfigDict(
 		env_file=(
 			Path(__file__).resolve().parent.parent / ".env",
@@ -56,6 +61,7 @@ class AppSettings(BaseSettings):
 		env_file_encoding="utf-8",
 		env_prefix="",
 		case_sensitive=False,
+		extra="ignore",
 	)
 
 	@classmethod
