@@ -19,11 +19,17 @@ def handle_slack_file(file_url: str, vendor_hint: Optional[str] = None, amount_h
 	# Download file
 	slack = SlackClient()
 	start_time = perf_counter()
-	content = slack.download_file(file_url)
+	response = slack.download_file(file_url)
+	# Support both requests.Response and raw bytes (for tests/monkeypatches)
+	if isinstance(response, (bytes, bytearray)):
+		content = bytes(response)
+		content_type = ""
+	else:
+		content = response.content  # type: ignore[attr-defined]
+		content_type = getattr(response, "headers", {}).get("Content-Type", "").lower()  # type: ignore[attr-defined]
 
-	# Determine type
-	is_pdf = file_url.lower().endswith(".pdf")
-	ext = None
+	# Determine type from Content-Type header or URL
+	is_pdf = "pdf" in content_type or file_url.lower().endswith(".pdf")
 	confidence = None
 
 	storage = FileStorage()

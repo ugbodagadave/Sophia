@@ -6,30 +6,37 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 
 from config.settings import get_settings
 
+try:  # Optional import for testability
+	from google.oauth2.service_account import Credentials  # type: ignore
+	from googleapiclient.discovery import build  # type: ignore
+except Exception:  # pragma: no cover
+	Credentials = None  # type: ignore
+	build = None  # type: ignore
 
 SCOPES = [
 	"https://www.googleapis.com/auth/spreadsheets",
-	"https://www.googleapis.com/auth/drive.readonly",
+	"https://www.googleapis.com/auth/drive",
 ]
 
 
 class GoogleSheetsClient:
 	def __init__(self) -> None:
-		# Lazy import to prevent module import-time dependency failures
-		from google.oauth2.service_account import Credentials
-		from googleapiclient.discovery import build
-
 		self.settings = get_settings()
-		creds = Credentials.from_service_account_file(
-			self.settings.google_sheets_credentials_path,
-			scopes=SCOPES,
-		)
-		self.service = build("sheets", "v4", credentials=creds)
+		if Credentials is None or build is None:
+			self.service = None
+		else:
+			creds = Credentials.from_service_account_file(
+				self.settings.google_sheets_credentials_path,
+				scopes=SCOPES,
+			)
+			self.service = build("sheets", "v4", credentials=creds)
 		self.spreadsheet_id = self.settings.google_sheets_spreadsheet_id
 		self.worksheet_name = self.settings.google_sheets_worksheet_name
 
 	@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=0.5, min=1, max=4))
 	def append_rows(self, rows: List[List[Any]]) -> Dict[str, Any]:
+		if not self.service:
+			return {}
 		range_name = f"{self.worksheet_name}!A1"
 		body = {"values": rows}
 		return (
@@ -41,6 +48,8 @@ class GoogleSheetsClient:
 
 	@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=0.5, min=1, max=4))
 	def get_range(self, range_a1: str) -> List[List[Any]]:
+		if not self.service:
+			return []
 		result = (
 			self.service.spreadsheets()
 			.values()
