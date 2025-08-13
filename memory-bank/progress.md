@@ -20,15 +20,18 @@
 - **Live Integration Tests**: Implemented comprehensive opt-in live tests with environment-gated execution
 - **Granite Robustness**: Added retries, schema validation, and structured logging to Granite client
 - **Documentation**: Enhanced with detailed live testing procedures and environment variable requirements
+- **E2E Runner**: Implemented command-line tool for processing Slack files with verbose output and optional mocks
+- **PDF OCR Fallback**: Enhanced PDF processing with OCR fallback for image-based PDFs
 
 ## Current Status
 - **Storage**: PostgreSQL backend operational with `receipt_files` table
 - **Slack Integration**: File downloads and confirmations working
 - **Google Sheets**: Expense data and file references being written correctly
-- **OCR/PDF Processing**: Tesseract OCR and PDF extraction functional
+- **OCR/PDF Processing**: Tesseract OCR and PDF extraction functional with OCR fallback
 - **AI Integration**: Granite client with retry mechanisms and validation
 - **Testing**: 30/30 tests passing with live tests skipped by default
-- **Documentation**: Comprehensive guides for live testing and API reference
+- **Documentation**: Comprehensive guides for live testing, E2E runner, and API reference
+- **E2E Processing**: Command-line tool available for verbose processing with mock/real service options
 
 ## Phase 6 Completion Checklist ✅
 - [x] Live integration tests with opt-in flags
@@ -38,6 +41,8 @@
 - [x] Structured error logging and validation failure handling
 - [x] Documentation updates for live tests and Granite robustness
 - [x] Green test suite with live tests gated by flags
+- [x] E2E runner with CLI options for verbose output and optional mocks
+- [x] PDF OCR fallback for image-based PDFs to improve text extraction
 
 ## Next Phase (Phase 7)
 - Deployment to IBM watsonx Orchestrate

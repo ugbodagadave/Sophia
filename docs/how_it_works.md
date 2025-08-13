@@ -13,7 +13,7 @@
   - **Local**: Files saved to configured local directory structure
 - Processing path determined by file type:
   - **Images**: `tools/document_processing/image_preprocessor.py` enhances image quality, then `image_ocr.py` extracts text with confidence scoring
-  - **PDFs**: `tools/document_processing/pdf_extractor.py` extracts text using pdfplumber with PyPDF2 fallback
+  - **PDFs**: `tools/document_processing/pdf_extractor.py` extracts text using pdfplumber with PyPDF2 fallback, plus OCR fallback for image-based PDFs
 
 ### 3. Data Extraction & AI Enhancement
 - `tools/document_processing/receipt_parser.py` applies heuristic parsing:
@@ -90,6 +90,44 @@
 - **Data Validation**: Type coercion and format normalization
 - **Duplicate Detection**: Identify potential duplicate receipts
 - **Audit Trail**: Complete processing history in Google Sheets
+
+## End-to-End Processing
+
+### E2E Runner (`e2e_test_runner.py`)
+
+A command-line tool for processing Slack files with verbose output and optional mocks:
+
+```bash
+# Basic usage
+python e2e_test_runner.py "https://files.slack.com/your-file-url.pdf"
+
+# With verbose output
+python e2e_test_runner.py "https://files.slack.com/your-file-url.pdf" --show-ocr --show-parsed --show-sheets-row
+
+# Real services
+python e2e_test_runner.py "https://files.slack.com/your-file-url.pdf" --real-sheets --real-slack-post
+
+# Use local file
+python e2e_test_runner.py "https://files.slack.com/your-file-url.pdf" --mock-download ./local-receipt.pdf
+```
+
+**Features:**
+- **Mock/Real Services**: Toggle between mock and real Google Sheets writes and Slack posts
+- **Verbose Output**: Print OCR text, parsed fields, and Google Sheets row data
+- **Local File Support**: Use local files instead of downloading from Slack
+- **Connectivity Checks**: Verify Google Sheets service availability before processing
+
+### PDF Processing Enhancements
+
+**Multi-stage Text Extraction:**
+1. **pdfplumber**: Primary text extraction for text-based PDFs
+2. **PyPDF2**: Fallback text extraction
+3. **OCR Fallback**: For image-based PDFs, convert pages to images and run Tesseract OCR
+
+**OCR Fallback Requirements:**
+- `pdf2image` library (requires poppler-utils)
+- `pytesseract` and Tesseract installation
+- `PIL` (Pillow) for image processing
 
 ## Live Tests (Opt-in)
 

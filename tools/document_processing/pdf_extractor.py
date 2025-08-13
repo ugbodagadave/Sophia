@@ -13,6 +13,21 @@ try:
 except Exception:  # pragma: no cover
 	PdfReader = None  # type: ignore
 
+# Optional OCR fallback for image-based PDFs
+try:  # pragma: no cover - optional dependency
+	from pdf2image import convert_from_path  # type: ignore
+except Exception:
+	convert_from_path = None  # type: ignore
+
+try:  # pragma: no cover - optional dependency
+	import pytesseract  # type: ignore
+	from PIL import Image  # type: ignore
+except Exception:
+	pytesseract = None  # type: ignore
+	Image = None  # type: ignore
+
+from config.settings import get_settings
+
 
 def extract_pdf_text(pdf_path: Path) -> str:
 	text_parts: list[str] = []
@@ -38,4 +53,24 @@ def extract_pdf_text(pdf_path: Path) -> str:
 					text_parts.append(content)
 		except Exception:
 			pass
-	return "\n".join(text_parts) 
+	if text_parts:
+		return "\n".join(text_parts)
+
+	# OCR fallback for image-based PDFs
+	settings = get_settings()
+	if convert_from_path is not None and pytesseract is not None and Image is not None:
+		try:
+			# Convert PDF to images (requires poppler installed and accessible in PATH)
+			images = convert_from_path(str(pdf_path), dpi=200)
+			if settings.tesseract_cmd:
+				pytesseract.pytesseract.tesseract_cmd = settings.tesseract_cmd
+			for img in images:
+				text = pytesseract.image_to_string(img, lang=settings.tesseract_lang)
+				if text:
+					text_parts.append(text)
+			return "\n".join(text_parts)
+		except Exception:
+			# Silent fallback to empty string if OCR pipeline unavailable
+			return ""
+	# No text extracted
+	return "" 

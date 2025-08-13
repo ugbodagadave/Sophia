@@ -11,6 +11,8 @@
 
 ## Document Processing
 - extract_pdf_text(pdf_path: Path) -> str
+  - Multi-stage extraction: pdfplumber → PyPDF2 → OCR fallback for image-based PDFs
+  - OCR fallback requires pdf2image, pytesseract, and poppler-utils
 - preprocess_image_for_ocr(image_path: Path, threshold: bool = False) -> Path
 - ocr_image_to_text(image_path: Path) -> str
 - ocr_image_with_confidence(image_path: Path) -> Tuple[str, Optional[float]]
@@ -42,6 +44,12 @@
 - process_slack_file_url(file_url: str) -> str
 - handle_query(query: str) -> str
   - Supports date ranges and optional exports
+
+## End-to-End Processing
+- e2e_test_runner.py
+  - Command-line tool for processing Slack files with verbose output
+  - Options: --mock-download, --real-sheets, --real-slack-post, --show-ocr, --show-parsed, --show-sheets-row
+  - Supports local file processing and connectivity checks
 
 Notes
 - The Google Sheet now includes a last column `Reference` which contains a single link to the stored receipt (image or PDF).

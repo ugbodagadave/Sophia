@@ -44,7 +44,8 @@ def handle_slack_file(file_url: str, vendor_hint: Optional[str] = None, amount_h
 			text = extract_pdf_text(tmp_path)
 			# After local processing, upload original bytes to storage and build link
 			stored = storage.save_bytes(f"pdf/{filename}", content)
-			reference_link = storage.generate_public_link(f"pdf/{filename}")
+			reference_link = storage.generate_public_link(stored)
+			fallback_ref = str(stored)
 		else:
 			filename = build_receipt_filename("unknown", vendor_hint or "vendor", amount_hint or "0", "jpg")
 			tmp_path = Path(tmpdir) / filename
@@ -53,17 +54,19 @@ def handle_slack_file(file_url: str, vendor_hint: Optional[str] = None, amount_h
 			text, confidence = ocr_image_with_confidence(pre)
 			# After local processing, upload original bytes to storage and build link
 			stored = storage.save_bytes(f"images/{filename}", content)
-			reference_link = storage.generate_public_link(f"images/{filename}")
+			reference_link = storage.generate_public_link(stored)
+			fallback_ref = str(stored)
 
 	parsed = parse_receipt_text(text or "")
+	link_value = reference_link or fallback_ref  # ensure non-empty for visibility
 	expense = {
 		"Date": parsed.get("date"),
 		"Vendor": parsed.get("vendor"),
 		"Amount": parsed.get("amount"),
 		"Category": parsed.get("category"),
-		"Receipt_PDF_Link": reference_link if is_pdf else "",
-		"Receipt_Image_Link": reference_link if not is_pdf else "",
-		"Reference": reference_link or "",
+		"Receipt_PDF_Link": link_value if is_pdf else "",
+		"Receipt_Image_Link": link_value if not is_pdf else "",
+		"Reference": link_value or "",
 	}
 	try:
 		append_expense_row(expense)

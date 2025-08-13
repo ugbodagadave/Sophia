@@ -12,6 +12,7 @@ Sophia is an intelligent bookkeeping assistant that automates expense tracking b
 - **Simple User Experience**: Just upload and get confirmation - no complex workflows
 - **Analytics & Reporting**: Query expense data with natural language
 - **Live Testing**: Comprehensive integration tests with opt-in environment flags
+- **End-to-End Runner**: Command-line tool for processing Slack files with verbose output
 
 ## 📋 Prerequisites
 
@@ -21,6 +22,7 @@ Sophia is an intelligent bookkeeping assistant that automates expense tracking b
 - Google Cloud service account with Sheets API access
 - Slack app with bot token and file permissions
 - PostgreSQL database (optional - local storage available)
+- Poppler (optional - for PDF OCR fallback)
 
 ## 🛠️ Installation
 
@@ -123,6 +125,32 @@ Ask questions in Slack like:
 - "spend by category last 3 months"
 - "top vendors this month"
 - "export csv for Q2 2024"
+
+### End-to-End Processing
+
+Use the E2E runner to process Slack files with verbose output and optional mocks:
+
+```bash
+# Basic usage
+python e2e_test_runner.py "https://files.slack.com/your-file-url.pdf"
+
+# With verbose output (OCR text, parsed fields, Sheets row)
+python e2e_test_runner.py "https://files.slack.com/your-file-url.pdf" --show-ocr --show-parsed --show-sheets-row
+
+# Real services (actually write to Sheets and post to Slack)
+python e2e_test_runner.py "https://files.slack.com/your-file-url.pdf" --real-sheets --real-slack-post
+
+# Use local file instead of downloading from Slack
+python e2e_test_runner.py "https://files.slack.com/your-file-url.pdf" --mock-download ./local-receipt.pdf
+```
+
+**E2E Runner Options:**
+- `--mock-download <path>`: Use local file instead of downloading from Slack
+- `--real-sheets`: Actually write to Google Sheets (default: mock)
+- `--real-slack-post`: Actually send Slack confirmation (default: mock)
+- `--show-ocr`: Print OCR/PDF text snippet and confidence
+- `--show-parsed`: Print parsed fields from heuristics + Granite
+- `--show-sheets-row`: Print the row dict sent to Google Sheets
 
 ## 🧪 Testing
 
@@ -263,6 +291,7 @@ Sophia/
 │   ├── document_processing/ # OCR and PDF processing
 │   └── utilities/         # Helper functions
 ├── workflows/             # End-to-end process flows
+├── e2e_test_runner.py    # Command-line E2E processor
 └── tests/                 # Test suite
 ```
 
