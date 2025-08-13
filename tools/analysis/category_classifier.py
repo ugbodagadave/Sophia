@@ -27,13 +27,9 @@ def _heuristic_category(vendor: str, description: Optional[str]) -> Optional[str
 
 
 def classify_expense(vendor: str, description: Optional[str] = None) -> str:
-	settings = get_settings()
 	category = _heuristic_category(vendor or "", description)
 	if category:
 		return category
-	# Optional Granite enrichment
-	if settings.watsonx_api_key and settings.watsonx_project_id:
-		client = GraniteClient()
-		# For now, we do not call a real endpoint; placeholder to keep interface stable
-		_ = client  # avoid unused variable
-	return "Uncategorized" 
+	# Mandatory Granite-backed suggestion when heuristics fail
+	client = GraniteClient()
+	return client.suggest_category(vendor or "", description) or "Uncategorized" 
