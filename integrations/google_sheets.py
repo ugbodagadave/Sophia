@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import List, Dict, Any
 
-from google.oauth2.service_account import Credentials
-from googleapiclient.discovery import build
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from config.settings import get_settings
@@ -17,6 +15,10 @@ SCOPES = [
 
 class GoogleSheetsClient:
 	def __init__(self) -> None:
+		# Lazy import to prevent module import-time dependency failures
+		from google.oauth2.service_account import Credentials
+		from googleapiclient.discovery import build
+
 		self.settings = get_settings()
 		creds = Credentials.from_service_account_file(
 			self.settings.google_sheets_credentials_path,

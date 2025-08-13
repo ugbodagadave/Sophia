@@ -1,0 +1,8 @@
+- [ ] Tests: utilities (`date_parser`, `file_handler`), communication (`slack_formatter`)
+- [ ] Tests: data (`sheets_writer`) with stubbed Google client
+- [ ] Workflow: `workflows/receipt_processing_flow.py` stub to process Slack file URL
+- [ ] Docs: Fill `docs/how_it_works.md` and `docs/api_reference.md`
+- [ ] E2E (dev): dry-run path to append a row to Google Sheets with a fake payload
+- [ ] Phase 5: analysis tools scaffolding (`expense_analyzer`, `category_classifier`, `report_generator`)
+- [ ] Phase 6: workflow tests and sample data
+- [ ] Phase 7: deployment notes and monitoring hooks 
