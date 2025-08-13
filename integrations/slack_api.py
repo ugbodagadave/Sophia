@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 import requests
 from slack_sdk import WebClient
@@ -17,6 +17,14 @@ class SlackClient:
 	def post_message(self, channel: str, text: str) -> Optional[str]:
 		try:
 			resp = self.client.chat_postMessage(channel=channel, text=text)
+			return resp.get("ts")
+		except SlackApiError:
+			return None
+
+	def post_blocks(self, channel: str, blocks: List[Dict[str, Any]], text: str = "") -> Optional[str]:
+		"""Post Block Kit payload to Slack with optional text fallback."""
+		try:
+			resp = self.client.chat_postMessage(channel=channel, text=text or " ", blocks=blocks)
 			return resp.get("ts")
 		except SlackApiError:
 			return None
