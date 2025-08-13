@@ -3,13 +3,19 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Optional, Tuple
 
-import pytesseract
-from PIL import Image
+try:  # Optional import to keep tests runnable without system Tesseract
+	import pytesseract  # type: ignore
+	from PIL import Image  # type: ignore
+except Exception:  # pragma: no cover
+	pytesseract = None  # type: ignore
+	Image = None  # type: ignore
 
 from config.settings import get_settings
 
 
 def ocr_image_to_text(image_path: Path) -> str:
+	if pytesseract is None or Image is None:
+		raise RuntimeError("pytesseract/Pillow not available")
 	settings = get_settings()
 	if settings.tesseract_cmd:
 		pytesseract.pytesseract.tesseract_cmd = settings.tesseract_cmd
@@ -18,6 +24,8 @@ def ocr_image_to_text(image_path: Path) -> str:
 
 
 def ocr_image_with_confidence(image_path: Path) -> Tuple[str, Optional[float]]:
+	if pytesseract is None or Image is None:
+		raise RuntimeError("pytesseract/Pillow not available")
 	settings = get_settings()
 	if settings.tesseract_cmd:
 		pytesseract.pytesseract.tesseract_cmd = settings.tesseract_cmd

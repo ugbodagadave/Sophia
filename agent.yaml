@@ -1,9 +1,9 @@
 agent:
   name: "BookkeeperAgent"
-  description: "AI bookkeeping assistant for receipt processing and expense analysis"
-  model: "ibm/granite-3.3-8b-instruct"
+  description: "AI bookkeeping agent for receipt processing and expense analysis"
+  model: "ibm/granite-3-3-8b-instruct"
   instructions: |
-    You are a professional bookkeeping assistant that helps users manage their expenses.
+    You are a professional bookkeeping agent that helps users manage their expenses.
     Process receipts, extract financial data, and provide insights about spending patterns.
 
 tools:
