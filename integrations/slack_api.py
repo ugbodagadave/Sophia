@@ -47,9 +47,9 @@ class SlackClient:
 			return None
 
 	def download_file(self, url: str) -> Response:
-		headers = {}
-		# Add auth header only for Slack URLs
-		if "files.slack.com" in url:
+		headers: Dict[str, str] = {}
+		# Add auth header for Slack-hosted URLs (workspace domains or files.slack.com)
+		if "slack.com" in url:
 			headers["Authorization"] = f"Bearer {self.settings.slack_bot_token}"
 		r = requests.get(url, headers=headers, timeout=30)
 		r.raise_for_status()

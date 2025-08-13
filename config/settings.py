@@ -31,6 +31,8 @@ class AppSettings(BaseSettings):
 	local_storage_path: str = "./data/file_storage/receipts/"
 	cloud_storage_bucket: Optional[str] = None
 	public_url_base: Optional[str] = None
+	# Database (PostgreSQL)
+	database_url: Optional[str] = None
 
 	# OCR
 	tesseract_cmd: Optional[str] = None

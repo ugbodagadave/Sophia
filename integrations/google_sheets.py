@@ -15,7 +15,6 @@ except Exception:  # pragma: no cover
 
 SCOPES = [
 	"https://www.googleapis.com/auth/spreadsheets",
-	"https://www.googleapis.com/auth/drive",
 ]
 
 

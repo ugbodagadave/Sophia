@@ -28,6 +28,7 @@ def _column_map() -> Dict[str, str]:
 		"Currency": "currency",
 		"Confidence_Score": "confidence_score",
 		"Processed_Date": "processed_date",
+		"Reference": "reference",
 	}
 
 

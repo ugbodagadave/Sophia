@@ -30,9 +30,6 @@ def test_e2e_receipt_processing_monkeypatched(monkeypatch, tmp_path):
 	monkeypatch.setattr(sh, "append_expense_row", lambda expense: captured.update(expense))
 	# Execute
 	summary = handle_slack_file("https://files.slack.com/fake.jpg")
-	assert "Receipt processed:" in summary
-	assert "Date: 2024-12-31" in summary
-	assert "Vendor: ACME STORE" in summary
-	assert "Amount: 15.99" in summary
+	assert summary == "Receipt added to Google Sheet."
 	# Ensure row would have been sent
 	assert captured.get("Vendor") == "ACME STORE" 

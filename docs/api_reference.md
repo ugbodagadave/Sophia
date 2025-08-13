@@ -7,7 +7,7 @@
 - SlackClient
   - post_message(channel: str, text: str) -> Optional[str]
   - post_blocks(channel: str, blocks: List[Dict[str, Any]], text: str = "") -> Optional[str]
-  - download_file(url: str) -> bytes
+  - download_file(url: str) -> bytes|Response
 
 ## Document Processing
 - extract_pdf_text(pdf_path: Path) -> str
@@ -17,8 +17,8 @@
 - parse_receipt_text(text: str) -> Dict[str, Any]
 
 ## Data Management
-- FileStorage
-  - save_bytes(relative_path: str, data: bytes) -> Path
+- FileStorage (local or postgres)
+  - save_bytes(relative_path: str, data: bytes) -> Path|str
   - generate_public_link(relative_path: str) -> Optional[str]
 - append_expense_row(expense: Dict[str, Any]) -> None
 - read_range(a1: str) -> List[List[Any]]
@@ -26,10 +26,6 @@
 ## Communication
 - format_receipt_summary(parsed: Dict[str, Any], confidence: float | None = None) -> str
 - format_error(message: str) -> str
-- build_receipt_blocks(parsed: Dict[str, Any], links: Dict[str, str] | None = None, confidence: float | None = None, processing_seconds: float | None = None) -> List[Dict[str, Any]]
-- build_analytics_blocks(title: str, total_text: str, fields_map: Dict[str, str]) -> List[Dict[str, Any]]
-- handle_slack_file(file_url: str, vendor_hint: Optional[str] = None, amount_hint: Optional[str] = None) -> str
-- send_status(text: str) -> None
 
 ## Analysis
 - rows_from_values(values: List[List[Any]], header: Optional[List[str]] = None) -> List[Dict[str, Any]]
@@ -50,5 +46,8 @@
 ## Workflows
 - process_slack_file_url(file_url: str) -> str
 - handle_query(query: str) -> str
-  - Supports date ranges: last N months, past N days, Q1–Q4 YYYY, this/last month, or `yyyy-mm`
-  - Supports exports: append `export csv` or `export json` to save a report and return a link
+  - Supports date ranges and optional exports
+
+Notes
+- The Google Sheet now includes a last column `Reference` which contains a single link to the stored receipt (image or PDF).
+- Slack replies only confirm success and do not include links or interactive buttons.

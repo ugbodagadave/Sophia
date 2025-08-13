@@ -10,6 +10,7 @@
 		"Payment_Method",
 		"Currency",
 		"Confidence_Score",
-		"Processed_Date"
+		"Processed_Date",
+		"Reference"
 	]
 } 

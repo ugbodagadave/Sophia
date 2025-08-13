@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Optional
 from time import perf_counter
+import tempfile
 
 from integrations.slack_api import SlackClient
 from tools.utilities.file_handler import build_receipt_filename
@@ -12,7 +13,7 @@ from tools.document_processing.image_ocr import ocr_image_with_confidence
 from tools.document_processing.pdf_extractor import extract_pdf_text
 from tools.document_processing.receipt_parser import parse_receipt_text
 from tools.data_management.sheets_writer import append_expense_row
-from tools.communication.slack_formatter import format_receipt_summary, format_error, build_receipt_blocks
+from tools.communication.slack_formatter import format_receipt_summary, format_error
 
 
 def handle_slack_file(file_url: str, vendor_hint: Optional[str] = None, amount_hint: Optional[str] = None) -> str:
@@ -33,19 +34,26 @@ def handle_slack_file(file_url: str, vendor_hint: Optional[str] = None, amount_h
 	confidence = None
 
 	storage = FileStorage()
-	if is_pdf:
-		filename = build_receipt_filename("unknown", vendor_hint or "vendor", amount_hint or "0", "pdf")
-		stored = storage.save_bytes(f"pdf/{filename}", content)
-		text = extract_pdf_text(stored)
-		pdf_link = storage.generate_public_link(f"pdf/{filename}")
-		img_link = ""
-	else:
-		filename = build_receipt_filename("unknown", vendor_hint or "vendor", amount_hint or "0", "jpg")
-		stored = storage.save_bytes(f"images/{filename}", content)
-		pre = preprocess_image_for_ocr(stored)
-		text, confidence = ocr_image_with_confidence(pre)
-		pdf_link = ""
-		img_link = storage.generate_public_link(f"images/{filename}")
+	reference_link: Optional[str] = None
+	# Create a temp file to run local processing regardless of storage backend
+	with tempfile.TemporaryDirectory() as tmpdir:
+		if is_pdf:
+			filename = build_receipt_filename("unknown", vendor_hint or "vendor", amount_hint or "0", "pdf")
+			tmp_path = Path(tmpdir) / filename
+			tmp_path.write_bytes(content)
+			text = extract_pdf_text(tmp_path)
+			# After local processing, upload original bytes to storage and build link
+			stored = storage.save_bytes(f"pdf/{filename}", content)
+			reference_link = storage.generate_public_link(f"pdf/{filename}")
+		else:
+			filename = build_receipt_filename("unknown", vendor_hint or "vendor", amount_hint or "0", "jpg")
+			tmp_path = Path(tmpdir) / filename
+			tmp_path.write_bytes(content)
+			pre = preprocess_image_for_ocr(tmp_path)
+			text, confidence = ocr_image_with_confidence(pre)
+			# After local processing, upload original bytes to storage and build link
+			stored = storage.save_bytes(f"images/{filename}", content)
+			reference_link = storage.generate_public_link(f"images/{filename}")
 
 	parsed = parse_receipt_text(text or "")
 	expense = {
@@ -53,19 +61,17 @@ def handle_slack_file(file_url: str, vendor_hint: Optional[str] = None, amount_h
 		"Vendor": parsed.get("vendor"),
 		"Amount": parsed.get("amount"),
 		"Category": parsed.get("category"),
-		"Receipt_PDF_Link": pdf_link,
-		"Receipt_Image_Link": img_link,
+		"Receipt_PDF_Link": reference_link if is_pdf else "",
+		"Receipt_Image_Link": reference_link if not is_pdf else "",
+		"Reference": reference_link or "",
 	}
 	try:
 		append_expense_row(expense)
 	except Exception:
 		return format_error("Failed to write to Google Sheets. Check credentials and spreadsheet settings.")
 
-	# Build Block Kit message
-	processing_seconds = perf_counter() - start_time
-	blocks = build_receipt_blocks(parsed, {"pdf": pdf_link, "image": img_link}, confidence, processing_seconds)
-	# If configured, post to channel; otherwise return text for tests
+	# Only confirmation message to the user
 	if slack.settings.slack_channel_id:
-		slack.post_blocks(slack.settings.slack_channel_id, blocks, text="Receipt processed")
+		slack.post_message(slack.settings.slack_channel_id, text=format_receipt_summary(parsed, confidence))
 
 	return format_receipt_summary(parsed, confidence) 
