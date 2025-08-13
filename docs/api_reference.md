@@ -6,6 +6,7 @@
   - get_range(range_a1: str) -> List[List[Any]]
 - SlackClient
   - post_message(channel: str, text: str) -> Optional[str]
+  - post_blocks(channel: str, blocks: List[Dict[str, Any]], text: str = "") -> Optional[str]
   - download_file(url: str) -> bytes
 
 ## Document Processing
@@ -25,6 +26,8 @@
 ## Communication
 - format_receipt_summary(parsed: Dict[str, Any], confidence: float | None = None) -> str
 - format_error(message: str) -> str
+- build_receipt_blocks(parsed: Dict[str, Any], links: Dict[str, str] | None = None, confidence: float | None = None, processing_seconds: float | None = None) -> List[Dict[str, Any]]
+- build_analytics_blocks(title: str, total_text: str, fields_map: Dict[str, str]) -> List[Dict[str, Any]]
 - handle_slack_file(file_url: str, vendor_hint: Optional[str] = None, amount_hint: Optional[str] = None) -> str
 - send_status(text: str) -> None
 
@@ -40,7 +43,12 @@
 - format_overview_for_slack(total_formatted: str, average_formatted: str, count: int) -> str
 - dicts_to_csv_string(rows: Iterable[Dict[str, object]], fieldnames: List[str]) -> str
 - data_to_json_string(data: object) -> str
+- save_report_csv(relative_path: str, rows: Iterable[Dict[str, object]], fieldnames: List[str]) -> str | None
+- save_report_json(relative_path: str, data: object) -> str | None
+- build_fields_with_percentages(amounts: Dict[str, Decimal]) -> Dict[str, str]
 
 ## Workflows
 - process_slack_file_url(file_url: str) -> str
 - handle_query(query: str) -> str
+  - Supports date ranges: last N months, past N days, Q1–Q4 YYYY, this/last month, or `yyyy-mm`
+  - Supports exports: append `export csv` or `export json` to save a report and return a link

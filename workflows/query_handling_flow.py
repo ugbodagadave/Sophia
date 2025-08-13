@@ -14,7 +14,9 @@ from tools.analysis.expense_analyzer import (
 	totals_and_averages,
 	format_summary_for_slack,
 )
-from tools.analysis.report_generator import format_key_amount_map_for_slack
+from tools.analysis.report_generator import format_key_amount_map_for_slack, save_report_csv, save_report_json, build_fields_with_percentages
+from integrations.slack_api import SlackClient
+from tools.communication.slack_formatter import build_analytics_blocks
 
 
 def _parse_simple_dates(query: str) -> tuple[str | None, str | None]:
@@ -85,14 +87,30 @@ def handle_query(query: str) -> str:
 	- top vendors N
 	- largest expenses N
 	- last month | this month | explicit yyyy-mm | last N months | past N days | Q[1-4] YYYY
+	- export csv/json (append 'export csv' or 'export json')
 	"""
 	values: List[List[Any]] = read_range("Expenses!A:K")
 	rows = rows_from_values(values)
 	q = (query or "").lower()
 	start, end = _parse_simple_dates(q)
 
+	export_csv = "export csv" in q
+	export_json = "export json" in q
+
 	if "by category" in q:
 		data = summarize_by_category(rows, start, end)
+		if export_csv:
+			link = save_report_csv("reports/by_category.csv", [{"Category": k, "Amount": str(v)} for k, v in data.items()], ["Category", "Amount"])
+			return f"Report saved: {link}" if link else format_key_amount_map_for_slack("Spend by Category:", data)
+		if export_json:
+			link = save_report_json("reports/by_category.json", {k: str(v) for k, v in data.items()})
+			return f"Report saved: {link}" if link else format_key_amount_map_for_slack("Spend by Category:", data)
+		# Also attempt Block Kit if configured
+		settings_client = SlackClient()
+		if settings_client.settings.slack_channel_id:
+			fields = build_fields_with_percentages(data)
+			blocks = build_analytics_blocks("📊 Spend by Category", "Totals by category", fields)
+			settings_client.post_blocks(settings_client.settings.slack_channel_id, blocks, text="Analytics")
 		return format_key_amount_map_for_slack("Spend by Category:", data)
 	if "by vendor" in q:
 		data = summarize_by_vendor(rows, start, end)

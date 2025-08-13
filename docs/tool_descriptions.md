@@ -10,7 +10,7 @@
 
 ## Integrations
 - `integrations/google_sheets.py`: Append and read ranges from Google Sheets
-- `integrations/slack_api.py`: Post messages and download files from Slack using bot token
+- `integrations/slack_api.py`: Post messages and blocks to Slack; download files with bot token
 
 ## Document Processing
 - `pdf_extractor.py`: Extract text from PDFs using pdfplumber with PyPDF2 fallback
@@ -20,5 +20,8 @@
 
 ## Analysis
 - `tools/analysis/expense_analyzer.py`: Aggregate spend by category, vendor, and month; compute totals and averages; utilities to map sheet rows and format a Slack-ready summary.
-- `tools/analysis/category_classifier.py`: Keyword-based classifier for vendors/descriptions; returns a category or `Uncategorized`; ready for optional Granite enrichment for ambiguous cases.
-- `tools/analysis/report_generator.py`: Format analyzer outputs for Slack blocks; export helpers to CSV/JSON strings for saving or sharing.
+- `tools/analysis/category_classifier.py`: Keyword-based classifier for vendors/descriptions; returns a category or `Uncategorized`; Granite-backed suggestions when heuristics fail.
+- `tools/analysis/report_generator.py`: Format analyzer outputs for Slack blocks; export helpers to CSV/JSON strings or save via `FileStorage` with public link generation.
+
+## Communication
+- `tools/communication/slack_formatter.py`: Simple text formatters plus Block Kit builders for receipt confirmations and analytics (sections + fields + context).

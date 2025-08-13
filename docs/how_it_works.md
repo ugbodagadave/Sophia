@@ -9,23 +9,22 @@
 - `tools/document_processing/receipt_parser.py` heuristics (+ Granite enrichment later)
 - Expense row is mapped using `tools/data_management/sheets_writer.py` (columns from `data/templates/sheets_template.json`) and appended to Google Sheets
 - Confirmation text formatted by `tools/communication/slack_formatter.py`
+- When `SLACK_CHANNEL_ID` is set, a Block Kit confirmation is posted (header + fields + context)
 
-## Query Handling Flow (Phase 5)
-- A natural-language query arrives (e.g., "summary for June", "spend by category")
-- `workflows/query_handling_flow.py` parses the intent with simple heuristics
+## Query Handling Flow (Phase 5/6)
+- Natural-language query arrives (e.g., "summary for June", "spend by category last 3 months export csv")
+- `workflows/query_handling_flow.py` parses the intent and optional date ranges:
+  - this month, last month, `yyyy-mm`, last N months, past N days, Q1–Q4 YYYY
 - Data is fetched from Google Sheets via `tools/data_management/sheets_reader.py`
 - Rows are converted to dictionaries using `tools/analysis/expense_analyzer.rows_from_values`
-- Aggregations are computed with `expense_analyzer` (by category/month/vendor, totals)
-- Output is formatted for Slack using `expense_analyzer.format_summary_for_slack` or `report_generator` helpers
+- Aggregations with `expense_analyzer` (by category/month/vendor, totals)
+- Output is formatted for Slack using Block Kit or plain text fallback
+- Optional exports: add `export csv` or `export json` to save a report under `reports/` using `FileStorage` and return a link when `PUBLIC_URL_BASE` is configured
 
-Example:
+Example (analytics):
 ```
-User: show spend by category
-Bot: 
-Spend by Category:
-- Dining: USD 120.50
-- Groceries: USD 85.00
-- Transport: USD 34.20
+User: spend by category last 2 months export csv
+Bot: Report saved: https://.../reports/by_category.csv
 ```
 
 ## Error Handling
