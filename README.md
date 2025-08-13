@@ -1,9 +1,225 @@
-# Sophia (AI Bookkeeping Agent)
+# Sophia - AI-Powered Bookkeeping Agent
 
-Build an AI-powered bookkeeping agent using IBM watsonx Orchestrate, IBM Granite 3.3, and Tesseract OCR. See:
+Sophia is an intelligent bookkeeping assistant that automates expense tracking by processing receipts uploaded to Slack. Using IBM Granite AI and Tesseract OCR, Sophia extracts expense data and stores it in Google Sheets with file references for easy accountant review.
 
-- `sophia_guide.md` for setup and operations
-- `sophia-plan.md` for phased implementation
-- Agent config at `bookkeeper_agent/agent.yaml`
+## 🚀 Features
 
-Repository: https://github.com/ugbodagadave/Sophia 
+- **Automated Receipt Processing**: Upload images or PDFs to Slack for instant processing
+- **AI-Powered Extraction**: IBM Granite 3.3 AI enhances parsing accuracy
+- **OCR Technology**: Tesseract OCR with image preprocessing for better text recognition
+- **Secure Storage**: PostgreSQL database for file storage with UUID management
+- **Google Sheets Integration**: Automatic expense data entry with file references
+- **Simple User Experience**: Just upload and get confirmation - no complex workflows
+- **Analytics & Reporting**: Query expense data with natural language
+
+## 📋 Prerequisites
+
+- Python 3.10 or higher
+- Tesseract OCR installed and configured
+- IBM watsonx account with Granite 3.3 access
+- Google Cloud service account with Sheets API access
+- Slack app with bot token and file permissions
+- PostgreSQL database (optional - local storage available)
+
+## 🛠️ Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/ugbodagadave/Sophia.git
+   cd Sophia
+   ```
+
+2. **Create virtual environment**
+   ```bash
+   python -m venv .venv
+   # Windows
+   .venv\Scripts\activate
+   # macOS/Linux
+   source .venv/bin/activate
+   ```
+
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Configure environment**
+   ```bash
+   cp .env.sample .env
+   # Edit .env with your configuration
+   ```
+
+## ⚙️ Configuration
+
+Create a `.env` file with the following variables:
+
+### IBM Watsonx Configuration
+```
+WATSONX_API_KEY=your_api_key_here
+WATSONX_PROJECT_ID=your_project_id_here
+WATSONX_URL=https://us-south.ml.cloud.ibm.com
+GRANITE_MODEL_ID=ibm/granite-3-3-8b-instruct
+```
+
+### Google Services
+```
+GOOGLE_SHEETS_CREDENTIALS_PATH=./config/google-credentials.json
+GOOGLE_SHEETS_SPREADSHEET_ID=your_spreadsheet_id_here
+GOOGLE_SHEETS_WORKSHEET_NAME=Expenses
+```
+
+### Slack Integration
+```
+SLACK_BOT_TOKEN=xoxb-your-bot-token
+SLACK_APP_TOKEN=xapp-your-app-token
+SLACK_SIGNING_SECRET=your_signing_secret
+SLACK_CHANNEL_ID=your_channel_id
+```
+
+### Storage Configuration
+```
+FILE_STORAGE_TYPE=postgres  # or 'local'
+DATABASE_URL=postgresql://user:password@host:port/database
+LOCAL_STORAGE_PATH=./data/file_storage/receipts/
+PUBLIC_URL_BASE=https://your-domain.com  # optional
+```
+
+### OCR Configuration
+```
+TESSERACT_CMD=C:\Program Files\Tesseract-OCR\tesseract.exe
+TESSERACT_LANG=eng
+OCR_CONFIDENCE_THRESHOLD=70
+IMAGE_PREPROCESSING=true
+```
+
+### Processing Settings
+```
+MAX_FILE_SIZE_MB=10
+SUPPORTED_IMAGE_FORMATS=jpg,jpeg,png,tiff,bmp
+SUPPORTED_PDF_MAX_PAGES=5
+PROCESSING_TIMEOUT_SECONDS=30
+```
+
+### Business Rules
+```
+DEFAULT_CURRENCY=USD
+TIMEZONE=America/New_York
+AUTO_CATEGORIZATION=true
+DUPLICATE_DETECTION=true
+```
+
+## 🚀 Usage
+
+### Receipt Processing
+1. Upload a receipt (image or PDF) to your configured Slack channel
+2. Sophia automatically processes the file and extracts expense data
+3. Data is stored in Google Sheets with a file reference
+4. You receive a confirmation: "Receipt added to Google Sheet."
+
+### Querying Expenses
+Ask questions in Slack like:
+- "summary for June"
+- "spend by category last 3 months"
+- "top vendors this month"
+- "export csv for Q2 2024"
+
+## 🧪 Testing
+
+Run the test suite:
+```bash
+python -m pytest
+```
+
+Run specific test categories:
+```bash
+# Unit tests only
+python -m pytest tests/ -v
+
+# Integration tests
+python -m pytest tests/test_integrations/ -v
+
+# Workflow tests
+python -m pytest tests/test_workflows/ -v
+```
+
+## 📁 Project Structure
+
+```
+Sophia/
+├── config/                 # Configuration files
+├── data/                   # Templates and schemas
+├── docs/                   # Documentation
+├── integrations/           # External service clients
+├── memory-bank/           # Project context and progress
+├── models/                # AI model integration
+├── tools/                 # Core processing tools
+│   ├── analysis/          # Data analysis and reporting
+│   ├── communication/     # Slack messaging
+│   ├── data_management/   # Storage and sheets integration
+│   ├── document_processing/ # OCR and PDF processing
+│   └── utilities/         # Helper functions
+├── workflows/             # End-to-end process flows
+└── tests/                 # Test suite
+```
+
+## 🔧 Development
+
+### Key Components
+
+- **Document Processing**: OCR, PDF extraction, image preprocessing
+- **AI Integration**: IBM Granite for receipt parsing and categorization
+- **Storage**: PostgreSQL with UUID-based file management
+- **Integrations**: Slack for file uploads, Google Sheets for data storage
+- **Analysis**: Expense categorization, reporting, and analytics
+
+### Architecture
+
+- **Micro-module Design**: Small, focused tools with single responsibilities
+- **Environment-driven Configuration**: All settings via environment variables
+- **Graceful Degradation**: Fallback behaviors when services are unavailable
+- **Retry Mechanisms**: Exponential backoff for external API calls
+
+## 📊 Google Sheets Structure
+
+The expense data is stored with the following columns:
+- **Date**: Transaction date
+- **Vendor**: Merchant or business name
+- **Amount**: Transaction amount
+- **Category**: Expense category (auto-assigned)
+- **Receipt_PDF_Link**: PDF file reference (if applicable)
+- **Receipt_Image_Link**: Image file reference (if applicable)
+- **Description**: Additional transaction details
+- **Payment_Method**: Payment method used
+- **Currency**: Transaction currency
+- **Confidence_Score**: OCR confidence percentage
+- **Processed_Date**: When the receipt was processed
+- **Reference**: Unified file link for accountant access
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Ensure all tests pass
+6. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+For issues and questions:
+- Check the [documentation](docs/)
+- Review the [how it works guide](docs/how_it_works.md)
+- Open an issue on GitHub
+
+## 🔄 Status
+
+- **Phase 6**: ✅ Storage & User Experience (Completed)
+- **Next**: Phase 7 - Deployment to IBM watsonx Orchestrate
+
+---
+
+**Sophia** - Making expense tracking effortless with AI-powered automation. 
